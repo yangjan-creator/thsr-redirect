@@ -5,6 +5,10 @@
     {
       "source": "/r/thsr",
       "destination": "/api/r/thsr"
+    },
+    {
+      "source": "/movie/vieshow_detail",
+      "destination": "/api/movie/vieshow_detail"
     }
   ]
 }
