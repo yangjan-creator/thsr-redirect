@@ -45,9 +45,36 @@ TDX_DEEPLINK_URL = (
 )
 HTTP_TIMEOUT = 5.0
 
+TDX_STATION_NAMES = {
+    # TDX MaaS deeplink endpoint expects these public-facing Chinese station
+    # names. Keep the full 12-station allowlist here so button parameters from
+    # taclaw, speech aliases, or future clients normalize at this boundary.
+    "南港": "南港",
+    "臺北": "台北",
+    "台北": "台北",
+    "板橋": "板橋",
+    "桃園": "桃園",
+    "新竹": "新竹",
+    "苗栗": "苗栗",
+    "臺中": "台中",
+    "台中": "台中",
+    "彰化": "彰化",
+    "雲林": "雲林",
+    "嘉義": "嘉義",
+    "臺南": "台南",
+    "台南": "台南",
+    "左營": "左營",
+    "新左營": "左營",
+}
+
 
 def _log(msg: str) -> None:
     print(f"[thsr-redirect] {msg}", file=sys.stderr, flush=True)
+
+
+def _normalize_tdx_station_name(name: str) -> str:
+    normalized = name.strip()
+    return TDX_STATION_NAMES.get(normalized, normalized)
 
 
 def _fetch_deeplink_or_irs(
@@ -84,6 +111,8 @@ def _fetch_deeplink_or_irs(
 
             # Step 2: deeplink fetch
             train_no_padded = train_no.zfill(4)
+            start_station = _normalize_tdx_station_name(from_zh)
+            end_station = _normalize_tdx_station_name(to_zh)
             r2 = client.get(
                 TDX_DEEPLINK_URL,
                 headers={"Authorization": f"Bearer {token}"},
@@ -95,8 +124,8 @@ def _fetch_deeplink_or_irs(
                     "disabled_ticket": 0,
                     "senior_ticket": 0,
                     "student_ticket": 0,
-                    "start_station": from_zh,
-                    "end_station": to_zh,
+                    "start_station": start_station,
+                    "end_station": end_station,
                     "departure_date": date,
                     "departure_number": train_no_padded,
                 },
